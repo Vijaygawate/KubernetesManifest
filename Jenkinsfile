@@ -7,21 +7,19 @@ node {
         checkout scm
     }
 
-    stage('Update GIT') {
-            script {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh "git config user.email vijaygawate79@gmail.com"
-                        sh "git config user.name Vijay Gawate"
-                        //sh "git switch main"
-                        sh "cat deployment.yaml"
-                        sh "sed -i 's+vijaygawate/gitops.*+vijaygawate/gitops:${DOCKERTAG}+g' deployment.yaml"
-                        sh "cat deployment.yaml"
-                        sh "git add ."
-                        sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
-                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/KubernetesManifest.git HEAD:main"
-      }
+     stage('Push the changed deployment file to Git'){
+            steps {
+                script{
+                    sh """
+                    git config --global user.name "Vijay Gawate"
+                    git config --global user.email "vijaygawate79@gmail.com"
+                    git add deployment.yml
+                    git commit -m 'Updated the deployment file' """
+                    withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'pass', usernameVariable: 'user')]) {
+                        sh "git push http://$user:$pass@github.com/KubernetesManifest.git:main"
+                    }
+                }
+            }
+        }
     }
-  }
-}
 }
