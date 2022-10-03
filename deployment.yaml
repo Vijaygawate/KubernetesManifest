@@ -18,7 +18,7 @@ spec:
         app: flaskdemo
     spec:
       containers:
-      - image: vijaygawate/gitops:11
+      - image: vijaygawate/gitops:12
         name: flaskdemo
         resources: {}
 status: {}
